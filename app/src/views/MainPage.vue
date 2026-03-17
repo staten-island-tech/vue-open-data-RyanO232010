@@ -1,26 +1,28 @@
 <template>
     <div>
-
+      <button @click="getData()">Click</button>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import PokemonCard from '@/components/PokemonCard.vue'
 
-const pokemon = ref([])
-async function getPokemon() {
+
+const data = ref([])
+async function getData() {
   try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=151&offset=0`)
+    const response = await fetch(`https://data.cityofnewyork.us/resource/jb7j-dtam.json`)
     const data = await response.json()
-    pokemon.value = data.results
+    data.value = data.results
   } catch (error) {
     console.log(error)
   }
+
+
+if(data.value.){
+  console.log(data)
 }
-onMounted(() => {
-  getPokemon()
-})
+}
 </script>
 
 <style scoped>
