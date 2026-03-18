@@ -1,9 +1,16 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'
 
-const app = createApp(App)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-app.use(router)
-
-app.mount('#app')
+createApp(App).use(router).mount('#app') 
