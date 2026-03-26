@@ -1,13 +1,14 @@
 <template>
   <div>
     <h1>Precinct Incident Data</h1>
-    <BarChart :data="chartData" />
+    <svg ref="svg"></svg>
+    <button @click="change('count')">Update Counts</button>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import BarChart from '../components/BarChart.vue'
+import { ref, onMounted, watch } from 'vue'
+import * as d3 from 'd3'
 
 const chartData = ref([])
 
@@ -28,7 +29,6 @@ async function getData() {
       precinct,
       count
     }))
-
   } catch (error) {
     console.error('Error fetching data:', error)
   }
@@ -37,6 +37,49 @@ async function getData() {
 onMounted(() => {
   getData()
 })
+
+const svg = ref(null)
+
+const drawChart = () => {
+  const width = 500;
+  const height = Math.min(500, width / 2);
+  const outerRadius = height / 2 - 10;
+  const innerRadius = outerRadius * 0.75;
+  const tau = 2 * Math.PI;
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  const svgEl = d3.select(svg.value)
+    .attr("viewBox", [-width / 2, -height / 2, width, height]);
+
+  const arc = d3.arc()
+    .innerRadius(innerRadius)
+    .outerRadius(outerRadius);
+
+  const pie = d3.pie().sort(null).value(d => d.count);  // Using count as the value for the pie chart
+  
+  const path = svgEl.datum(chartData.value).selectAll("path")
+    .data(pie)
+    .join("path")
+    .attr("fill", (d, i) => color(i))
+    .attr("d", arc)
+    .each(function(d) { this._current = d; });
+
+  function change(value) {
+    pie.value(d => d[value]); // change the value function dynamically (e.g., switch between count, or other values if present)
+    path.data(pie);  // recompute the new angles
+    path.transition().duration(750).attrTween("d", arcTween);  // apply the arc tween transition
+  }
+
+  function arcTween(a) {
+    const i = d3.interpolate(this._current, a);
+    this._current = i(0);
+    return t => arc(i(t));  // interpolate the arc during the transition
+  }
+
+  return Object.assign(svgEl.node(), { change });
+}
+
+watch(() => chartData.value, drawChart)
 </script>
 
 <style scoped>
@@ -47,5 +90,6 @@ h1 {
 
 div {
   padding: 20px;
+  text-align: center;
 }
 </style>
