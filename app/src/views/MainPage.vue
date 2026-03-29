@@ -1,17 +1,6 @@
 <template>
   <div>
-    <label for="pet-select">Borough of Interest:</label>
-    <select name="borough" id="borough-select">
-      <option value="">--Please choose a Borough</option>
-      <option value="brooklyn">Brooklyn</option>
-      <option value="staten-island">Staten Island</option>
-      <option value="bronx">Bronx</option>
-      <option value="queens">Queens</option>
-      <option value="manhattan">Manhattan</option>
-    </select>
-
-       <button>Confirm</button>
-
+     <RouterLink to="/boroughs"><button>Borough Data</button></RouterLink>
     <h1>Precinct Incident Data</h1>
     <svg ref="svg"></svg>
     <button @click="change('count')">Update Counts</button>
